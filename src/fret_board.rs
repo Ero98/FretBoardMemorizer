@@ -33,6 +33,10 @@ pub struct FretBoard {
 }
 
 impl FretBoard {
+    pub fn of_fret_cnt(fret_bar_cnt : u8) -> FretBoard {
+        FretBoard { zero_frets_tuning: Vec::from(ZERO_FRETS_STANDARD_TUNING), fret_bar_cnt: fret_bar_cnt }
+    }
+
     pub fn of_standard() -> FretBoard {
         FretBoard { zero_frets_tuning: Vec::from(ZERO_FRETS_STANDARD_TUNING), fret_bar_cnt: 24 }
     }

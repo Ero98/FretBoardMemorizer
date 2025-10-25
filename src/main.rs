@@ -199,5 +199,5 @@ impl App for FretBoardApp {
 fn main() {
     let win_option = NativeOptions::default();
     let _ = run_native("Guitar App", win_option, 
-        Box::new(|cc| Ok(Box::new(FretBoardApp::new(cc, FretBoard::of_standard())))));
+        Box::new(|cc| Ok(Box::new(FretBoardApp::new(cc, FretBoard::of_fret_cnt(14))))));
 }
