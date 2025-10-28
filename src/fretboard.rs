@@ -3,12 +3,12 @@ use crate::note::{Note};
 
 type StringName = u8;
 pub const ZERO_FRETS_STANDARD_TUNING : [(StringName, Note); 6] = [
-    (1, Note::of_natural(E, 4)),
-    (2, Note::of_natural(B, 3)),
-    (3, Note::of_natural(G, 3)),
-    (4, Note::of_natural(D, 3)),
-    (5, Note::of_natural(A, 2)),
-    (6, Note::of_natural(E, 2)),
+    (1, E.natural().on_octave(4)),
+    (2, B.natural().on_octave(3)),
+    (3, G.natural().on_octave(3)),
+    (4, D.natural().on_octave(3)),
+    (5, A.natural().on_octave(2)),
+    (6, E.natural().on_octave(2)),
 ];
 
 /// When you play a note, you put your finger on a string and "behind" a fret, or lift your finger if it is the zeroth fret.
@@ -27,18 +27,18 @@ impl Point {
     }
 }
 
-pub struct FretBoard {
+pub struct Fretboard {
     zero_frets_tuning : Vec<(StringName, Note)>,
     fret_bar_cnt : u8
 }
 
-impl FretBoard {
-    pub fn of_fret_cnt(fret_bar_cnt : u8) -> FretBoard {
-        FretBoard { zero_frets_tuning: Vec::from(ZERO_FRETS_STANDARD_TUNING), fret_bar_cnt: fret_bar_cnt }
+impl Fretboard {
+    pub fn of_fret_cnt(fret_bar_cnt : u8) -> Fretboard {
+        Fretboard { zero_frets_tuning: Vec::from(ZERO_FRETS_STANDARD_TUNING), fret_bar_cnt: fret_bar_cnt }
     }
 
-    pub fn of_standard() -> FretBoard {
-        FretBoard { zero_frets_tuning: Vec::from(ZERO_FRETS_STANDARD_TUNING), fret_bar_cnt: 24 }
+    pub fn of_standard() -> Fretboard {
+        Fretboard { zero_frets_tuning: Vec::from(ZERO_FRETS_STANDARD_TUNING), fret_bar_cnt: 24 }
     }
 
     pub fn string_name_vec(&self) -> Vec<StringName> {
@@ -63,8 +63,3 @@ impl FretBoard {
         panic!("String of number {string} dosen't exist...")
     }
 }
-
-
-
-struct Chord;
-struct Position;

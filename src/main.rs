@@ -1,9 +1,10 @@
 pub mod note;
-pub mod fret_board;
+pub mod fretboard;
+pub mod scale;
 use std::marker;
 
 use eframe::{egui::{Align2, Area, CentralPanel, Color32, FontFamily, FontId, Id, Painter, Pos2, Rect, Sense, Stroke, Vec2, WidgetRect}, run_native, App, NativeOptions};
-use crate::{fret_board::{FretBoard, Point}, note::{Accidental, Note, MIDDLE_C}};
+use crate::{fretboard::{Fretboard, Point}, note::{Accidental, Note, MIDDLE_C}};
 
 type StringName = u8;
 type FretNum = u8;
@@ -24,14 +25,14 @@ struct FretRepresent {
     fret_mark : Option<FretMark>
 }
 
-struct FretBoardApp {
-    fret_board : FretBoard,
+struct FretboardApp {
+    fret_board : Fretboard,
     strings : Vec<(StringName, StringRepresent)>,
     frets : Vec<(FretNum, FretRepresent)>
 }
 
-impl FretBoardApp {
-    fn new(cc: &eframe::CreationContext<'_>, fret_board : FretBoard) -> Self {
+impl FretboardApp {
+    fn new(cc: &eframe::CreationContext<'_>, fret_board : Fretboard) -> Self {
         let fret_bar_cnt = fret_board.fret_bar_cnt();
         let mut fret_represents_vec : Vec<(FretNum, FretRepresent)> = Vec::new();
         for i in 0..fret_bar_cnt {
@@ -76,7 +77,7 @@ impl FretBoardApp {
             }));
         }
 
-        FretBoardApp {
+        FretboardApp {
             fret_board : fret_board,
             strings : string_represent_vec,
             frets : fret_represents_vec
@@ -148,7 +149,7 @@ impl Redeployable for Rect {
     }
 }
 
-impl App for FretBoardApp {
+impl App for FretboardApp {
     fn update(&mut self, ctx: &eframe::egui::Context, frame: &mut eframe::Frame) {
         CentralPanel::default().show(ctx, |ui| {
             ui.heading("Guitar Fretboard");
@@ -199,5 +200,5 @@ impl App for FretBoardApp {
 fn main() {
     let win_option = NativeOptions::default();
     let _ = run_native("Guitar App", win_option, 
-        Box::new(|cc| Ok(Box::new(FretBoardApp::new(cc, FretBoard::of_fret_cnt(14))))));
+        Box::new(|cc| Ok(Box::new(FretboardApp::new(cc, Fretboard::of_fret_cnt(14))))));
 }

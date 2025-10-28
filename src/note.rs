@@ -1,24 +1,52 @@
 use strum_macros::IntoStaticStr;
 
+/// 自然音
 #[derive(IntoStaticStr)]
 #[derive(Clone)]
+#[derive(PartialEq)]
+#[derive(Debug)]
 pub enum NaturalNoteName {
     C, D, E, F, G, A, B
 }
 
 #[derive(Clone)]
+#[derive(PartialEq)]
+#[derive(Debug)]
 pub enum Accidental {
     Sharp, Flat
 }
 
+/// 音名
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct NoteName {
     natural_note_name : NaturalNoteName,
     accidental : Option<Accidental>
 }
 
+impl NaturalNoteName {
+    pub const fn natural(self) -> NoteName {
+        NoteName { natural_note_name: self, accidental: None }
+    }
+
+    pub const fn sharp(self) -> NoteName {
+        NoteName { natural_note_name: self, accidental: Some(Accidental::Sharp) }
+    }
+
+    pub const fn flat(self) -> NoteName {
+        NoteName { natural_note_name: self, accidental: Some(Accidental::Flat) }
+    }
+}
+
+/// 表示同一个音的音名
+impl PartialEq for NoteName {
+    fn eq(&self, other: &Self) -> bool {
+        self.integer_notation() == other.integer_notation()
+    }
+}
+
 impl NoteName {
-    const fn of_integer_notation_sharp_by_default(integer_notation : u8) -> NoteName {
+    pub const fn of_integer_notation_as_sharp(integer_notation : u8) -> Self {
         let natural_note_name = match integer_notation {
             0..=1 => NaturalNoteName::C,
             2..=3 => NaturalNoteName::D,
@@ -39,7 +67,7 @@ impl NoteName {
     }
 
     /// Over 11 means next octave, below 0 means last octave.
-    const fn raw_integer_notation(self) -> i8 {
+    pub const fn directional_integer_notation(&self) -> i8 {
         let natural_part = match self.natural_note_name {
                 NaturalNoteName::C => 0,
                 NaturalNoteName::D => 2,
@@ -50,7 +78,7 @@ impl NoteName {
                 NaturalNoteName::B => 11,
         };
 
-        let accidental_part = match self.accidental {
+        let accidental_part = match &self.accidental {
             Some(acc) => match acc {
                 Accidental::Sharp => 1,
                 Accidental::Flat => -1,
@@ -60,19 +88,38 @@ impl NoteName {
 
         natural_part + accidental_part
     }
+
+    pub const fn integer_notation(&self) -> u8 {
+        (self.directional_integer_notation() % 12) as u8
+    }
 }
 
 
 
 type OctaveNumber = u8;
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct Note {
     name : NoteName,
     octave : OctaveNumber
 }
+
+impl NoteName {
+    pub const fn on_octave(self, octave : OctaveNumber) -> Note {
+        Note { name: self, octave : octave }
+    }
+}
+
+impl PartialEq for Note {
+    fn eq(&self, other: &Self) -> bool {
+        self.minus_note(other) == Interval::UNISON
+    }
+}
+
 // C₄
 pub const MIDDLE_C : Note = Note{name : NoteName{natural_note_name: NaturalNoteName::C, accidental: None}, octave : 4};
 
+#[derive(PartialEq)]
 pub struct Interval {
     /// When two notes doing operation: a minus b returns an Interval, in this Interval:
     /// if semitone_diff > 0, it means a apears after b
@@ -101,31 +148,8 @@ impl Interval {
 }
 
 impl Note {
-    pub const fn of_natural(note_name : NaturalNoteName, octave : OctaveNumber) -> Note {
-        Note {
-            name: NoteName {
-                natural_note_name: note_name, 
-                accidental: None
-            },
-            octave: octave
-        }
-    }
-
-    pub const fn of(note_name : NaturalNoteName, accidental : Accidental, octave : OctaveNumber) -> Note {
-        Note {
-            name: NoteName {
-                natural_note_name: note_name, 
-                accidental: Some(accidental)
-            },
-            octave: octave
-        }
-    }
-
-    pub const fn of_integer_notation(integer_notation : u8, octave : OctaveNumber) -> Note {
-        Note {
-            name : NoteName::of_integer_notation_sharp_by_default(integer_notation),
-            octave : octave
-        }
+    pub fn note_name(&self) -> NoteName {
+        self.name.clone()
     }
 
     pub fn string_representation(self) -> String {
@@ -141,15 +165,15 @@ impl Note {
         String::from(note_natural_part_name_string) + accidental_str
     }
 
-    pub fn minus_note(self, other_note : Note) -> Interval {
-        let note_name_part = self.name.raw_integer_notation() - other_note.name.raw_integer_notation();
+    pub fn minus_note(&self, other_note : &Note) -> Interval {
+        let note_name_part = self.name.directional_integer_notation() - other_note.name.directional_integer_notation();
         let octave_part = (self.octave as i8 - other_note.octave as i8) * 12;
         
         Interval { semitone_diff: note_name_part + octave_part }
     }
 
-    pub fn add_interval(self, interval : Interval) -> Note {
-        let self_from_octave_zero = self.octave as i8 * 12 + self.name.raw_integer_notation();
+    pub fn add_interval(&self, interval : Interval) -> Note {
+        let self_from_octave_zero = self.octave as i8 * 12 + self.name.directional_integer_notation();
         let res_from_octave_zero = self_from_octave_zero + interval.semitone_diff;
         if res_from_octave_zero < 0 {
             panic!("Octave below zero is not considered...")
@@ -158,6 +182,6 @@ impl Note {
         let res_int_nota = res_from_octave_zero as u8 % 12;
         let res_octave = res_from_octave_zero as u8 / 12;
 
-        Note::of_integer_notation(res_int_nota, res_octave)
+        NoteName::of_integer_notation_as_sharp(res_int_nota).on_octave(res_octave)
     }
 }
