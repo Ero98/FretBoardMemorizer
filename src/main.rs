@@ -1,10 +1,15 @@
-pub mod note;
-pub mod fretboard;
-pub mod scale;
-use std::marker;
+pub mod music;
+pub mod guitar;
+pub mod service;
+
+use guitar::fretboard;
+use music::note;
+use crate::{fretboard::{Fretboard, Point}, note::{Accidental, Note, MIDDLE_C}};
 
 use eframe::{egui::{Align2, Area, CentralPanel, Color32, FontFamily, FontId, Id, Painter, Pos2, Rect, Sense, Stroke, Vec2, WidgetRect}, run_native, App, NativeOptions};
-use crate::{fretboard::{Fretboard, Point}, note::{Accidental, Note, MIDDLE_C}};
+
+use std::marker;
+
 
 type StringName = u8;
 type FretNum = u8;
@@ -181,7 +186,7 @@ impl App for FretboardApp {
 
                                 let point_rect = string_mouse_rect.intersect(fret_mouse_rect);
                                 let point_display = self.fret_board
-                                        .note_of_point(Point::of(string_num.clone(), fret_num.clone()))
+                                        .note_of_point(&Point::of(string_num.clone(), fret_num.clone()))
                                         .string_representation();
                                 
                                 // Draw the custom rectangle using the allocated rect

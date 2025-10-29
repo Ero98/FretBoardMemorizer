@@ -3,7 +3,7 @@ use std::usize;
 use crate::note::{Interval, Note, NoteName};
 
 /// 音阶 Scale
-fn scale_of<const N : usize>(root : NoteName, semitone_step_arr : [u8; N]) -> [NoteName; N] {
+fn scale_from_steps<const N : usize>(root : NoteName, semitone_step_arr : [u8; N]) -> [NoteName; N] {
     let step_sum = semitone_step_arr.iter().sum::<u8>();
     if step_sum != 12 {
         panic!("Semitone step arr must have a sum of 12 to produce a valid scale. Getting sum {step_sum} from {semitone_step_arr:?}");
@@ -15,42 +15,62 @@ fn scale_of<const N : usize>(root : NoteName, semitone_step_arr : [u8; N]) -> [N
     let mut semitone_acc : u8 = 0;
     for (i, &steps) in semitone_step_arr.iter().enumerate() {
         let interval = Interval::of_semitone_diff(semitone_acc as i8);
-        let note = root_note.add_interval(interval);
+        let note = root_note.add_interval(&interval);
         scale[i] = note.note_name();
         semitone_acc += steps;
     }
     scale
 }
 
-/// 七声音阶
-fn heptatonic_scale_of(root : NoteName, semitone_step_arr : [u8; 7]) -> [NoteName; 7] {
-    if semitone_step_arr.len() != 7 {
-        panic!("Semitone step arr must have a len of 7 to produce a heptatonic scale. Getting {semitone_step_arr:?}");
-    }
-    scale_of(root, semitone_step_arr)
+/// 七声调式
+fn heptatonic_scale_from_steps(root : NoteName, semitone_step_arr : [u8; 7]) -> [NoteName; 7] {
+    scale_from_steps(root, semitone_step_arr)
 }
 
 /// 自然音阶
-fn diatonic_scale_of(root : NoteName, semitone_step_arr : [u8; 7]) -> [NoteName; 7] {
-    if ! semitone_step_arr.iter().all(|step| *step == 1 || *step == 2) {
+fn diatonic_scale_from_steps(root : NoteName, semitone_step_arr : [u8; 7]) -> [NoteName; 7] {
+    let is_all_step_whole_or_half = semitone_step_arr.iter().all(|step| *step == 1 || *step == 2);
+    if ! is_all_step_whole_or_half {
         panic!("Semitone steps must all be 1 or 2 to produce a diatonic scale. Getting {semitone_step_arr:?}");
     }
-    scale_of(root, semitone_step_arr)
+    scale_from_steps(root, semitone_step_arr)
 }
 
 const W : u8 = 2; // 全音 whole-tone
 const H : u8 = 1; // 半音 half-tone
 
 pub fn major_scale_of(root : NoteName) -> [NoteName; 7] {
-    diatonic_scale_of(root, [W, W, H, W, W, W, H])
+    diatonic_scale_from_steps(root, [W, W, H, W, W, W, H])
 }
 
 pub fn minor_scale_of(root : NoteName) -> [NoteName; 7] {
-    diatonic_scale_of(root, [W, H, W, W, H, W, W])
+    diatonic_scale_from_steps(root, [W, H, W, W, H, W, W])
 }
 
 pub fn dorian_scale_of(root : NoteName) -> [NoteName; 7] {
-    diatonic_scale_of(root, [W, H, W, W, W, H, W])
+    diatonic_scale_from_steps(root, [W, H, W, W, W, H, W])
+}
+
+/// 五声调式
+fn pentatonic_scale_by_omitting(heptatonic : [NoteName; 7], omit_number_notation1 : &usize, omit_number_notation2 : &usize) -> [NoteName; 5] {
+    let mut tmp_vec = heptatonic.to_vec();
+    tmp_vec.remove(omit_number_notation1 - 1);
+    tmp_vec.remove(omit_number_notation2 - 1);
+
+    core::array::from_fn(|i| {
+        match tmp_vec.get(i) {
+            Some(note_name) => note_name.clone(),
+            None => panic!("No element found at index {i} in vec {tmp_vec:?}"),
+        }
+    })
+}
+
+fn major_pentatonic_scale_of(root : NoteName) -> [NoteName; 5] {
+    pentatonic_scale_by_omitting(major_scale_of(root), &4, &7)
+}
+
+fn minor_pentatonic_scale_of(root : NoteName) -> [NoteName; 5] {
+    pentatonic_scale_by_omitting(minor_scale_of(root), &2, &6)
 }
 
 /// 音阶绝对化，即将音阶中的每个音名转换成科学表示法（国际表示法）。假设了音阶数组仅覆盖一个八度

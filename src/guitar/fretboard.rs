@@ -12,6 +12,7 @@ pub const ZERO_FRETS_STANDARD_TUNING : [(StringName, Note); 6] = [
 ];
 
 /// When you play a note, you put your finger on a string and "behind" a fret, or lift your finger if it is the zeroth fret.
+#[derive(PartialEq, Eq, Hash, Debug)]
 pub struct Point {
     on_string : StringName,
     behind_fret : u8
@@ -49,9 +50,9 @@ impl Fretboard {
         self.fret_bar_cnt
     }
 
-    pub fn note_of_point(&self, point : Point) -> Note {
+    pub fn note_of_point(&self, point : &Point) -> Note {
         self.zero_fret_note_of_string(point.on_string)
-            .add_interval(Interval::of_semitone_diff(point.behind_fret as i8))
+            .add_interval(&Interval::of_semitone_diff(point.behind_fret as i8))
     }
 
     fn zero_fret_note_of_string(&self, string : StringName) -> Note {

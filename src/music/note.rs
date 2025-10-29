@@ -172,7 +172,7 @@ impl Note {
         Interval { semitone_diff: note_name_part + octave_part }
     }
 
-    pub fn add_interval(&self, interval : Interval) -> Note {
+    pub fn add_interval(&self, interval : &Interval) -> Note {
         let self_from_octave_zero = self.octave as i8 * 12 + self.name.directional_integer_notation();
         let res_from_octave_zero = self_from_octave_zero + interval.semitone_diff;
         if res_from_octave_zero < 0 {
