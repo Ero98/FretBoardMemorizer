@@ -152,6 +152,8 @@ impl Note {
         self.name.clone()
     }
 
+    pub fn octave(&self) -> OctaveNumber { self.octave }
+
     pub fn string_representation(self) -> String {
         let accidental_str = match self.name.accidental {
             Some(acc) => match acc {
@@ -162,7 +164,8 @@ impl Note {
         };
 
         let note_natural_part_name_string : &'static str = self.name.natural_note_name.into();
-        String::from(note_natural_part_name_string) + accidental_str
+        let octave_string = self.octave.to_string();
+        String::from(note_natural_part_name_string) + accidental_str + &octave_string
     }
 
     pub fn minus_note(&self, other_note : &Note) -> Interval {

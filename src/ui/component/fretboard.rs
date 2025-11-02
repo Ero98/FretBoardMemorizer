@@ -51,7 +51,7 @@ impl FretboardComponent {
             let fret_component = FretComponent {
                 center_x_pos: actual_area.left() + actual_area.width() * center_x_unit_pos,
                 fret_x_pos: actual_area.left() + actual_area.width() * right_x_unit_pos,
-                mouse_response_rect: mouse_response_unit_box.redeploy_by_parent(actual_area),
+                mouse_response_rect: redeploy_by_parent(&mouse_response_unit_box, &actual_area),
                 fret_mark: match i {
                     3 | 5 | 7 | 9 | 15 | 17 | 19 | 21 => Some(FretMark::SingleDot),
                     12 | 24 => Some(FretMark::DoubleDot),
@@ -84,7 +84,7 @@ impl FretboardComponent {
 
             let string_component = StringComponent {
                 center_y_pos: actual_area.top() + actual_area.height() * center_y_unit_pos,
-                mouse_response_rect: mouse_response_unit_rect.redeploy_by_parent(actual_area)
+                mouse_response_rect: redeploy_by_parent(&mouse_response_unit_rect, &actual_area)
             };
 
             string_represent_vec.push((i, string_component));
@@ -156,27 +156,21 @@ impl FretboardComponent {
         }
     }
 }
-
-trait Redeployable {
-    fn redeploy(&self, x_resize : f32, y_resize : f32, x_translate : f32, y_translate : f32) -> Self;
-    fn redeploy_by_parent(&self, parent : Rect) -> Self where Self: Sized {
-        let parent_size = parent.size();
-        let parent_translate = parent.left_top();
-        self.redeploy(parent_size.x, parent_size.y, parent_translate.x, parent_translate.y)
-    }
-}
-
-impl Redeployable for Rect {
-    fn redeploy(&self, x_resize : f32, y_resize : f32, x_translate : f32, y_translate : f32) -> Rect {
-        Rect {
-            min : Pos2 { 
-                x: self.min.x * x_resize + x_translate, 
-                y: self.min.y * y_resize + y_translate 
-            },
-            max : Pos2 {
-                x: self.max.x * x_resize + x_translate, 
-                y: self.max.y * y_resize + y_translate
-            }
+fn redeploy_by_parent(cur_rect : &Rect, parent : &Rect) -> Rect {
+    let parent_size = parent.size();
+    let parent_translate = parent.left_top();
+    let x_resize = parent_size.x;
+    let y_resize = parent_size.y;
+    let x_translate = parent_translate.x;
+    let y_translate = parent_translate.y;
+    Rect {
+        min : Pos2 {
+            x: cur_rect.min.x * x_resize + x_translate,
+            y: cur_rect.min.y * y_resize + y_translate
+        },
+        max : Pos2 {
+            x: cur_rect.max.x * x_resize + x_translate,
+            y: cur_rect.max.y * y_resize + y_translate
         }
     }
 }

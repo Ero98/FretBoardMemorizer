@@ -1,3 +1,4 @@
+use derive_getters::Getters;
 use crate::music::note::{Interval, NaturalNoteName::*};
 use crate::music::note::{Note};
 
@@ -12,7 +13,7 @@ pub const ZERO_FRETS_STANDARD_TUNING : [(StringName, Note); 6] = [
 ];
 
 /// When you play a note, you put your finger on a string and "behind" a fret, or lift your finger if it is the zeroth fret.
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Copy, Clone, Getters)]
 pub struct Point {
     on_string : StringName,
     behind_fret : u8
