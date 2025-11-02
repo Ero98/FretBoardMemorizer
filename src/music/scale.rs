@@ -1,6 +1,6 @@
 use std::usize;
 
-use crate::note::{Interval, Note, NoteName};
+use super::note::{Interval, Note, NoteName};
 
 /// 音阶 Scale
 fn scale_from_steps<const N : usize>(root : NoteName, semitone_step_arr : [u8; N]) -> [NoteName; N] {
@@ -92,7 +92,7 @@ impl <const N: usize> Absolutifiable<N> for [NoteName; N] {
 
 #[cfg(test)]
 mod tests {
-    use crate::note::NaturalNoteName::*;
+    use crate::music::note::NaturalNoteName::*;
     use super::*; // Import everything from the parent module
 
     #[test]

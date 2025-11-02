@@ -1,5 +1,5 @@
-use crate::note::{Interval, NaturalNoteName::*};
-use crate::note::{Note};
+use crate::music::note::{Interval, NaturalNoteName::*};
+use crate::music::note::{Note};
 
 type StringName = u8;
 pub const ZERO_FRETS_STANDARD_TUNING : [(StringName, Note); 6] = [
