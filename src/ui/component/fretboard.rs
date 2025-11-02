@@ -18,7 +18,8 @@ struct StringComponent {
 }
 
 enum FretMark {
-    SINGLE_DOT, DOUBLE_DOT
+    SingleDot,
+    DoubleDot
 }
 
 struct FretComponent {
@@ -52,8 +53,8 @@ impl FretboardComponent {
                 fret_x_pos: actual_area.left() + actual_area.width() * right_x_unit_pos,
                 mouse_response_rect: mouse_response_unit_box.redeploy_by_parent(actual_area),
                 fret_mark: match i {
-                    3 | 5 | 7 | 9 | 15 | 17 | 19 | 21 => Some(FretMark::SINGLE_DOT),
-                    12 | 24 => Some(FretMark::DOUBLE_DOT),
+                    3 | 5 | 7 | 9 | 15 | 17 | 19 | 21 => Some(FretMark::SingleDot),
+                    12 | 24 => Some(FretMark::DoubleDot),
                     _ => None
                 }
             };
@@ -138,13 +139,13 @@ impl FretboardComponent {
     fn draw_fret_dots(&self, painter: &Painter, rect: Rect, frets : &Vec<(FretNum, FretComponent)>) {
         for (_, fret) in frets {
             match fret.fret_mark {
-                Some(FretMark::SINGLE_DOT) => {
+                Some(FretMark::SingleDot) => {
                     // Draw fret dots at specific positions (e.g., frets 3, 5, 7, 9, 12)
                     let x_center = fret.center_x_pos;
                     let y_center = rect.center().y;
                     painter.circle_filled(Pos2::new(x_center, y_center), 5.0, Color32::from_gray(100));
                 },
-                Some(FretMark::DOUBLE_DOT) => {
+                Some(FretMark::DoubleDot) => {
                     // Fret 12 often has two dots
                     let x_center = fret.center_x_pos;
                     painter.circle_filled(Pos2::new(x_center, rect.center().y - 20.0), 5.0, Color32::from_gray(100));

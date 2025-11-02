@@ -5,7 +5,6 @@ edition = "2024"
 
 [dependencies]
 strum_macros = "0.27"
-derive-getters = "0.2" # Or the latest version
+derive-getters = "0.5.0" # Or the latest version
 
 eframe = "0.33.0"  # Use the latest version from crates.io
-strum = "0.27"
