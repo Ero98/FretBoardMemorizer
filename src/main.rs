@@ -4,7 +4,6 @@ pub mod service;
 pub mod ui;
 
 use eframe::{NativeOptions, run_native};
-use crate::guitar::fretboard::Fretboard;
 use crate::ui::window::{FretboardApp};
 
 

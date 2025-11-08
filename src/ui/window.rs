@@ -145,12 +145,6 @@ impl App for FretboardApp {
                         scale::major_scale_of(
                             self.fretboard.note_of_point(&selected_point).note_name()));
                     for point in scale_points {
-                        let fill_color = if point == self.cur_select_point.get().unwrap() {
-                            Color32::LIGHT_GREEN
-                        } else {
-                            Color32::WHITE
-                        };
-
                         let note = self.fretboard.note_of_point(&point);
                         let selected_note = self.fretboard.note_of_point(&selected_point);
                         let note_color = get_color_of_note(&note, &selected_note);
