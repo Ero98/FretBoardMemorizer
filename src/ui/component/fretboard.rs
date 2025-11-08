@@ -96,27 +96,42 @@ impl FretboardComponent {
         }
     }
 
-    pub fn get_mouse_inside_point_and_rect(&self, mouse_pos : Pos2) -> Option<(Point, Rect)> {
+    pub fn get_mouse_on_point_and_rect(&self, mouse_pos : Pos2) -> Option<(Point, Rect)> {
         for (string_num, string) in self.strings() {
-            let string_mouse_rect = string.mouse_response_rect;
-            if ! string_mouse_rect.contains(mouse_pos) {
+            if ! string.mouse_response_rect.contains(mouse_pos) {
                 continue;
             }
 
             for (fret_num, fret) in self.frets() {
-                let fret_mouse_rect = fret.mouse_response_rect;
-                if ! fret_mouse_rect.contains(mouse_pos) {
+                if ! fret.mouse_response_rect.contains(mouse_pos) {
                     continue;
                 }
 
                 return Some((Point::of(*string_num, *fret_num),
-                      string_mouse_rect.intersect(fret_mouse_rect)));
+                             string.mouse_response_rect.intersect(fret.mouse_response_rect)));
             }
         }
         None
     }
 
-    pub fn draw_fretboard(&self, painter: &Painter, rect: Rect) {
+    pub fn get_rect_on_point(&self, point : Point) -> Option<Rect> {
+        for (string_num, string) in self.strings() {
+            if string_num != point.on_string() {
+                continue;
+            }
+
+            for (fret_num, fret) in self.frets() {
+                if fret_num != point.behind_fret() {
+                    continue;
+                }
+
+                return Some(string.mouse_response_rect.intersect(fret.mouse_response_rect));
+            }
+        }
+        None
+    }
+
+    pub fn draw_fretboard_widgets(&self, painter: &Painter, rect: Rect) {
         self.draw_fret_dots(painter, rect, &self.frets);
 
         // Draw the vertical frets

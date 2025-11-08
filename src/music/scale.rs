@@ -52,10 +52,13 @@ pub fn dorian_scale_of(root : NoteName) -> [NoteName; 7] {
 }
 
 /// 五声调式
-fn pentatonic_scale_by_omitting(heptatonic : [NoteName; 7], omit_number_notation1 : &usize, omit_number_notation2 : &usize) -> [NoteName; 5] {
+fn pentatonic_scale_by_omitting(heptatonic : [NoteName; 7], omit_number_notation1 : usize, omit_number_notation2 : usize) -> [NoteName; 5] {
     let mut tmp_vec = heptatonic.to_vec();
-    tmp_vec.remove(omit_number_notation1 - 1);
-    tmp_vec.remove(omit_number_notation2 - 1);
+    let mut number_notations_to_remove = vec![omit_number_notation1, omit_number_notation2];
+    number_notations_to_remove.sort();
+    for number_notation_to_remove in number_notations_to_remove.iter().rev() {
+        tmp_vec.remove(number_notation_to_remove - 1);
+    }
 
     core::array::from_fn(|i| {
         match tmp_vec.get(i) {
@@ -65,12 +68,12 @@ fn pentatonic_scale_by_omitting(heptatonic : [NoteName; 7], omit_number_notation
     })
 }
 
-fn major_pentatonic_scale_of(root : NoteName) -> [NoteName; 5] {
-    pentatonic_scale_by_omitting(major_scale_of(root), &4, &7)
+pub fn major_pentatonic_scale_of(root : NoteName) -> [NoteName; 5] {
+    pentatonic_scale_by_omitting(major_scale_of(root), 4, 7)
 }
 
-fn minor_pentatonic_scale_of(root : NoteName) -> [NoteName; 5] {
-    pentatonic_scale_by_omitting(minor_scale_of(root), &2, &6)
+pub fn minor_pentatonic_scale_of(root : NoteName) -> [NoteName; 5] {
+    pentatonic_scale_by_omitting(minor_scale_of(root), 2, 6)
 }
 
 /// 音阶绝对化，即将音阶中的每个音名转换成科学表示法（国际表示法）。假设了音阶数组仅覆盖一个八度

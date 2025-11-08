@@ -92,6 +92,19 @@ impl NoteName {
     pub const fn integer_notation(&self) -> u8 {
         (self.directional_integer_notation() % 12) as u8
     }
+
+    pub fn string_representation(self) -> String {
+        let accidental_str = match self.accidental {
+            Some(acc) => match acc {
+                Accidental::Sharp => "#",
+                Accidental::Flat => "b",
+            },
+            None => "",
+        };
+
+        let note_natural_part_name_string : &'static str = self.natural_note_name.into();
+        String::from(note_natural_part_name_string) + accidental_str
+    }
 }
 
 
@@ -145,6 +158,10 @@ impl Interval {
     pub fn of_semitone_diff(semitone_diff : i8) -> Interval {
         Interval { semitone_diff : semitone_diff }
     }
+
+    pub fn semitone_diff(&self) -> i8 {
+        self.semitone_diff
+    }
 }
 
 impl Note {
@@ -155,17 +172,8 @@ impl Note {
     pub fn octave(&self) -> OctaveNumber { self.octave }
 
     pub fn string_representation(self) -> String {
-        let accidental_str = match self.name.accidental {
-            Some(acc) => match acc {
-                Accidental::Sharp => "#",
-                Accidental::Flat => "b",
-            },
-            None => "",
-        };
-
-        let note_natural_part_name_string : &'static str = self.name.natural_note_name.into();
         let octave_string = self.octave.to_string();
-        String::from(note_natural_part_name_string) + accidental_str + &octave_string
+        self.note_name().string_representation() + &octave_string
     }
 
     pub fn minus_note(&self, other_note : &Note) -> Interval {

@@ -1,6 +1,6 @@
-use crate::{guitar::fretboard::{self, Fretboard, Point}, music::note::NoteName};
+use crate::{guitar::fretboard::{Fretboard, Point}, music::note::NoteName};
 
-fn scale_notes_on_fretboard<const N: usize>(fretboard : Fretboard, scale : [NoteName; N]) -> Vec<Point> {
+pub fn scale_notes_on_fretboard<const N: usize>(fretboard : &Fretboard, scale : [NoteName; N]) -> Vec<Point> {
     let mut scale_notes = Vec::new();
     for string_name in fretboard.string_name_vec() {
         for fret_bar in 0..fretboard.fret_bar_cnt() {
@@ -35,7 +35,7 @@ mod scale_map {
                 Point::of(6, 0), Point::of(6, 1),                  Point::of(6, 3),
             ],
             &scale_notes_on_fretboard(
-                Fretboard::of_fret_cnt(4), 
+                &Fretboard::of_fret_cnt(4),
                 scale::major_scale_of(C.natural()))
         ));
     }
